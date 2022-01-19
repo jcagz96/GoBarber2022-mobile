@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -8,8 +8,10 @@ import {
   Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 import { Container, Title, BackToSignIn, BackToSignInText } from './styles';
 import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
@@ -21,6 +23,16 @@ import { RootStackParamList } from '../../routes';
 const SignUp: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const formRef = useRef<FormHandles>(null);
+
+  const ola = useCallback(() => {
+    formRef.current?.submitForm();
+  }, []);
+
+  const handleSignUp = useCallback((data: object) => {
+    console.log(data);
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -37,21 +49,23 @@ const SignUp: React.FC = () => {
           <View>
             <Title>Crie a sua Conta</Title>
           </View>
-
-          <Input name="name" icon="user" placeholder="Nome" />
-          <Input name="email" icon="mail" placeholder="E-mail" />
-          <Input name="password" icon="lock" placeholder="Senha" />
-          <Button
-            onPress={() => {
-              console.log('deu');
+          <Form
+            onSubmit={handleSignUp}
+            ref={formRef}
+            style={{
+              width: '100%',
             }}
           >
-            Entrar
-          </Button>
+            <Input name="name" icon="user" placeholder="Nome" />
+            <Input name="email" icon="mail" placeholder="E-mail" />
+            <Input name="password" icon="lock" placeholder="Senha" />
+            <Button onPress={ola}>Entrar</Button>
+          </Form>
 
           <BackToSignIn
             onPress={() => {
-              navigation.navigate('SignIn');
+              // navigation.navigate('SignIn');
+              navigation.goBack();
             }}
           >
             <Icon name="arrow-left" size={20} color="#fff" />

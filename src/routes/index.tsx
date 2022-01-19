@@ -4,7 +4,12 @@ import { View } from 'react-native';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 
-const Auth = createNativeStackNavigator();
+export type RootStackParamList = {
+  SignIn: undefined;
+  SignUp: undefined;
+};
+
+const Auth = createNativeStackNavigator<RootStackParamList>();
 
 const AuthRoutes: React.FC = () => (
   <Auth.Navigator

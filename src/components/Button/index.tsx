@@ -1,8 +1,17 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
-import { RectButtonProperties } from 'react-native-gesture-handler';
+import {
+  TouchableNativeFeedbackProps,
+  TouchableOpacityProps,
+} from 'react-native';
+
 import { Container, ButtonText } from './styles';
 
-interface ButtonProps extends RectButtonProperties {
+interface ButtonProps
+  extends Pick<
+  TouchableNativeFeedbackProps & TouchableOpacityProps,
+  | 'onPress'
+  > {
   children: string;
 }
 
