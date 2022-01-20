@@ -6,6 +6,7 @@ import {
   Platform,
   View,
   Keyboard,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
@@ -25,10 +26,8 @@ const SignUp: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const formRef = useRef<FormHandles>(null);
-
-  const ola = useCallback(() => {
-    formRef.current?.submitForm();
-  }, []);
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
   const handleSignUp = useCallback((data: object) => {
     console.log(data);
@@ -56,10 +55,42 @@ const SignUp: React.FC = () => {
               width: '100%',
             }}
           >
-            <Input name="name" icon="user" placeholder="Nome" />
-            <Input name="email" icon="mail" placeholder="E-mail" />
-            <Input name="password" icon="lock" placeholder="Senha" />
-            <Button onPress={ola}>Entrar</Button>
+            <Input
+              autoCapitalize="words"
+              name="name"
+              icon="user"
+              placeholder="Nome"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                emailInputRef.current?.focus();
+              }}
+            />
+            <Input
+              keyboardType="email-address"
+              ref={emailInputRef}
+              autoCorrect={false}
+              autoCapitalize="none"
+              name="email"
+              icon="mail"
+              placeholder="E-mail"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                passwordInputRef.current?.focus();
+              }}
+            />
+            <Input
+              secureTextEntry
+              ref={passwordInputRef}
+              name="password"
+              icon="lock"
+              placeholder="Senha"
+              textContentType="newPassword"
+              returnKeyType="send"
+              onSubmitEditing={() => formRef.current?.submitForm()}
+            />
+            <Button onPress={() => formRef.current?.submitForm()}>
+              Entrar
+            </Button>
           </Form>
 
           <BackToSignIn
