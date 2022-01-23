@@ -5,7 +5,6 @@ import {
   ScrollView,
   Platform,
   View,
-  Keyboard,
   TextInput,
   Alert,
 } from 'react-native';
@@ -21,6 +20,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { RootStackParamList } from '../../routes';
 import getValidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/api';
 
 interface SignUpFormData {
   name: string;
@@ -36,35 +36,52 @@ const SignUp: React.FC = () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSignUp = useCallback(async (data: SignUpFormData) => {
-    try {
-      formRef.current?.setErrors({});
+  const handleSignUp = useCallback(
+    async (data: SignUpFormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-      const schema = Yup.object().shape({
-        name: Yup.string().required('Nome obrigatório'),
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().min(6, 'No mínimo 6 dígitos'),
-      });
+        console.log(' entrou no try  ');
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
-    } catch (error: unknown) {
-      if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(error);
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+        });
 
-        formRef.current?.setErrors(errors);
-        return;
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        console.log(' entrou no try , antes do teste ');
+        const teste = await api.post('/users', data);
+
+        console.log(`--> ${JSON.stringify(data)}`);
+
+        Alert.alert(
+          'Registo realizado com sucesso',
+          'Você já pode fazer login na aplicação',
+        );
+
+        navigation.goBack();
+      } catch (error: unknown) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+
+          formRef.current?.setErrors(errors);
+          return;
+        }
+        // disparar um toast
+        Alert.alert(
+          'Erro no Registo',
+          'Ocorreu um erro ao fazer o registo, tente novamente',
+        );
       }
-      // disparar um toast
-      Alert.alert(
-        'Erro no Registo',
-        'Ocorreu um erro ao fazer o registo, tente novamente',
-      );
-    }
-  }, []);
+    },
+    [navigation],
+  );
 
   return (
     <KeyboardAvoidingView
@@ -121,7 +138,12 @@ const SignUp: React.FC = () => {
               returnKeyType="send"
               onSubmitEditing={() => formRef.current?.submitForm()}
             />
-            <Button onPress={() => formRef.current?.submitForm()}>
+            <Button
+              onPress={() => {
+                console.log('botão de submit foi pressionado');
+                formRef.current?.submitForm();
+              }}
+            >
               Entrar
             </Button>
           </Form>
