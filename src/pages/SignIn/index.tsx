@@ -27,6 +27,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { RootStackParamList } from '../../routes';
 import getValidationErrors from '../../utils/getValidationErrors';
+import { useAuth } from '../../hooks/auth';
 
 interface SignInFormData {
   email: string;
@@ -39,37 +40,42 @@ const SignIn: React.FC = () => {
 
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
+  const { signIn } = useAuth();
 
-  const handleSignIn = useCallback(async (data: SignInFormData) => {
-    // eslint-disable-next-line prefer-template
-    console.log('--> ' + data);
-    try {
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().required('Senha obrigatória'),
-      });
+  const handleSignIn = useCallback(
+    async (data: SignInFormData) => {
+      // eslint-disable-next-line prefer-template
+      try {
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required('Senha obrigatória'),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
-    } catch (error: unknown) {
-      if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(error);
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-        // eslint-disable-next-line prefer-template
-        console.log('--> erro' + JSON.stringify(errors));
+        await signIn({
+          email: data.email,
+          password: data.password,
+        });
+      } catch (error: unknown) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
 
-        formRef.current?.setErrors(errors);
-      } else {
-        Alert.alert(
-          'Erro na autenticação',
-          'Ocorreu um erro ao fazer login, tente novamente',
-        );
+          formRef.current?.setErrors(errors);
+        } else {
+          Alert.alert(
+            'Erro na autenticação',
+            'Ocorreu um erro ao fazer login, tente novamente',
+          );
+        }
       }
-    }
-  }, []);
+    },
+    [signIn],
+  );
 
   return (
     <KeyboardAvoidingView
