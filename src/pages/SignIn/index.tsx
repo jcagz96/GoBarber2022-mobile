@@ -25,7 +25,7 @@ import {
 import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { RootStackParamList } from '../../routes';
+import { RootStackParamList } from '../../routes/auth.routes';
 import getValidationErrors from '../../utils/getValidationErrors';
 import { useAuth } from '../../hooks/auth';
 

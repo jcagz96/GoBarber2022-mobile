@@ -1,15 +1,14 @@
 import React from 'react';
-import { View, Text, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import AuthRoutes from './routes';
-import { Container, Title } from './pages/SignIn/styles';
+import Routes from './routes/index';
 import AppProvider from './hooks';
 
 const App: React.FC = () => (
   <NavigationContainer>
     <StatusBar barStyle="light-content" backgroundColor="#312e38" />
     <AppProvider>
-      <AuthRoutes />
+      <Routes />
     </AppProvider>
   </NavigationContainer>
 );
