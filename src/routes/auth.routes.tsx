@@ -7,6 +7,7 @@ import SignUp from '../pages/SignUp';
 export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
+  Profile: undefined;
 };
 
 const Auth = createNativeStackNavigator<RootStackParamList>();
