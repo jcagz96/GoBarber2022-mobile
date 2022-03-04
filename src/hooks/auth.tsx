@@ -46,6 +46,8 @@ export const AuthProvider: React.FC = ({ children }) => {
       ]);
 
       if (token[1] && user[1]) {
+        // eslint-disable-next-line dot-notation
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setData({ token: token[1], user: JSON.parse(user[1]) });
       }
       setLoading(false);
@@ -65,6 +67,9 @@ export const AuthProvider: React.FC = ({ children }) => {
       ['@GoBarber:token', token],
       ['@GoBarber:user', JSON.stringify(user)],
     ]);
+
+    // eslint-disable-next-line dot-notation
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     setData({ token, user });
   }, []);

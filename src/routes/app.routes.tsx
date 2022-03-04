@@ -7,7 +7,9 @@ import Profile from '../pages/Profile';
 
 export type RootStackParamList = {
   Dashboard: undefined;
-  CreateAppointment: undefined;
+  CreateAppointment: {
+    providerId: string;
+  };
   AppointmentCreated: undefined;
   Profile: undefined;
 };

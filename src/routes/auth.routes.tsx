@@ -8,6 +8,9 @@ export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   Profile: undefined;
+  CreateAppointment: {
+    providerId: string;
+  };
 };
 
 const Auth = createNativeStackNavigator<RootStackParamList>();
