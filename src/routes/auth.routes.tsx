@@ -1,6 +1,5 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View } from 'react-native';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 
@@ -10,6 +9,9 @@ export type RootStackParamList = {
   Profile: undefined;
   CreateAppointment: {
     providerId: string;
+  };
+  AppointmentCreated: {
+    date: number;
   };
 };
 

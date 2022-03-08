@@ -10,7 +10,9 @@ export type RootStackParamList = {
   CreateAppointment: {
     providerId: string;
   };
-  AppointmentCreated: undefined;
+  AppointmentCreated: {
+    date: number;
+  };
   Profile: undefined;
 };
 
