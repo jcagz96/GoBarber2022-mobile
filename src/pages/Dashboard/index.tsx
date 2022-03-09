@@ -43,9 +43,8 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const navigateToProfie = useCallback(() => {
-    // navigation.navigate('Profile');
-    signOut();
-  }, [signOut]);
+    navigation.navigate('Profile');
+  }, [navigation]);
 
   const navigateToCreateAppointment = useCallback(
     (providerId: string) => {
