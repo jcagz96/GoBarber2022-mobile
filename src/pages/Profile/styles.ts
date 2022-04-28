@@ -26,9 +26,15 @@ export const UserAvatarButton = styled.TouchableOpacity`
 `;
 
 export const UserAvatar = styled.Image`
-  width: 186px;
-  height: 186px;
-  border-radius: 98px;
-  margin-top: 64px;
+  width: 156px;
+  height: 156px;
+  border-radius: 78px;
+  margin-top: 84px;
   align-self: center;
+`;
+
+export const LogoutButton = styled.TouchableOpacity`
+  margin-top: 10px;
+  justify-content: center;
+  align-items: center;
 `;

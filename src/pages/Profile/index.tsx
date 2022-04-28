@@ -2,13 +2,13 @@
 /* eslint-disable camelcase */
 import React, { useCallback, useRef } from 'react';
 import {
-  Image,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
   View,
   TextInput,
   Alert,
+  Text,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
@@ -16,14 +16,15 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
+import { launchImageLibrary } from 'react-native-image-picker';
 import {
   Container,
   Title,
   UserAvatarButton,
   UserAvatar,
   BackButton,
+  LogoutButton,
 } from './styles';
-import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { RootStackParamList } from '../../routes/auth.routes';
@@ -40,7 +41,7 @@ interface ProfileFormData {
 }
 
 const SignUp: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, signOut } = useAuth();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -128,6 +129,47 @@ const SignUp: React.FC = () => {
     [navigation, updateUser],
   );
 
+  const handleUpdateAvatar = useCallback(async () => {
+    const imageLibraryResponse = await launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 200,
+      maxWidth: 200,
+      selectionLimit: 1
+    })
+
+    if (imageLibraryResponse.didCancel) {
+      return;
+    }
+
+    if (imageLibraryResponse.errorCode) {
+      Alert.alert("Erro ao atualizar sua foto de perfil");
+      return;
+    }
+
+    if (imageLibraryResponse.assets && imageLibraryResponse.assets[0]) {
+      const formdata = new FormData();
+      formdata.append('avatar', {
+        uri: Platform.OS === 'android' ? imageLibraryResponse.assets[0].uri : imageLibraryResponse.assets[0].uri?.replace('file://', ''),
+        type: imageLibraryResponse.assets[0].type,
+        name: imageLibraryResponse.assets[0].fileName
+      });
+
+      try {
+        const apiResponse = await api.patch("/users/avatar", formdata);
+        updateUser(apiResponse.data.user);
+      } catch (error) {
+        Alert.alert("Erro ao atualizar sua foto de perfil");
+      }
+
+    }
+    else {
+      Alert.alert("Erro ao atualizar sua foto de perfil");
+    }
+
+
+  }, [updateUser]);
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -143,7 +185,7 @@ const SignUp: React.FC = () => {
             <Icon name="chevron-left" size={24} color="#999591" />
           </BackButton>
 
-          <UserAvatarButton>
+          <UserAvatarButton onPress={handleUpdateAvatar}>
             <UserAvatar source={{ uri: user.avatar_url }} />
           </UserAvatarButton>
 
@@ -220,12 +262,14 @@ const SignUp: React.FC = () => {
             />
             <Button
               onPress={() => {
-                console.log('botão de submit foi pressionado');
                 formRef.current?.submitForm();
               }}
             >
               Confirmar Mudanças
             </Button>
+            <LogoutButton onPress={signOut}>
+              <Text>Logout</Text>
+            </LogoutButton>
           </Form>
         </Container>
       </ScrollView>
