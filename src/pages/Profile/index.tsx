@@ -1,6 +1,7 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable prettier/prettier */
 /* eslint-disable camelcase */
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   ScrollView,
@@ -9,6 +10,10 @@ import {
   TextInput,
   Alert,
   Text,
+  StyleSheet,
+  Modal,
+  Pressable,
+  TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
@@ -16,7 +21,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import {
   Container,
   Title,
@@ -44,6 +49,8 @@ const SignUp: React.FC = () => {
   const { user, updateUser, signOut } = useAuth();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const formRef = useRef<FormHandles>(null);
   const emailInputRef = useRef<TextInput>(null);
@@ -170,6 +177,46 @@ const SignUp: React.FC = () => {
 
   }, [updateUser]);
 
+  const handleUpdateAvatar2 = useCallback(async () => {
+    const imageLibraryResponse = await launchCamera({
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 200,
+      maxWidth: 200,
+    })
+
+    if (imageLibraryResponse.didCancel) {
+      return;
+    }
+
+    if (imageLibraryResponse.errorCode) {
+      Alert.alert("Erro ao atualizar sua foto de perfil 1");
+      return;
+    }
+
+    if (imageLibraryResponse.assets && imageLibraryResponse.assets[0]) {
+      const formdata = new FormData();
+      formdata.append('avatar', {
+        uri: Platform.OS === 'android' ? imageLibraryResponse.assets[0].uri : imageLibraryResponse.assets[0].uri?.replace('file://', ''),
+        type: imageLibraryResponse.assets[0].type,
+        name: imageLibraryResponse.assets[0].fileName
+      });
+
+      try {
+        const apiResponse = await api.patch("/users/avatar", formdata);
+        updateUser(apiResponse.data.user);
+      } catch (error) {
+        Alert.alert("Erro ao atualizar sua foto de perfil 2");
+      }
+
+    }
+    else {
+      Alert.alert("Erro ao atualizar sua foto de perfil 3");
+    }
+
+
+  }, [updateUser]);
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -185,7 +232,7 @@ const SignUp: React.FC = () => {
             <Icon name="chevron-left" size={24} color="#999591" />
           </BackButton>
 
-          <UserAvatarButton onPress={handleUpdateAvatar}>
+          <UserAvatarButton onPress={() => setModalVisible(true)}>
             <UserAvatar source={{ uri: user.avatar_url }} />
           </UserAvatarButton>
 
@@ -271,9 +318,87 @@ const SignUp: React.FC = () => {
               <Text>Logout</Text>
             </LogoutButton>
           </Form>
+          <Modal
+            animationType="slide"
+            transparent
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <View style={{ flexDirection: 'row' }}>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={handleUpdateAvatar}
+                  >
+                    <Text style={styles.textStyle}>Galeria</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={handleUpdateAvatar2}
+                  >
+                    <Text style={styles.textStyle}>Camera</Text>
+                  </Pressable>
+                </View>
+                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={{ color: "white" }}>Fechar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </Container>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: '#312e38',
+    borderRadius: 20,
+    padding: 35,
+    width: 350,
+    height: 180,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    flexDirection: 'column'
+  },
+  button: {
+    margin: 20,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#ff9000",
+  },
+  textStyle: {
+    color: '#312e38',
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  }
+});
+
 export default SignUp;
