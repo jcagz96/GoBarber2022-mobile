@@ -28,6 +28,7 @@ import Input from '../../components/Input';
 import { RootStackParamList } from '../../routes/auth.routes';
 import getValidationErrors from '../../utils/getValidationErrors';
 import { useAuth } from '../../hooks/auth';
+import { LocalNotification } from '../../services/LocalPushController';
 
 interface SignInFormData {
   email: string;
@@ -41,7 +42,6 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const { signIn } = useAuth();
-
   const handleSignIn = useCallback(
     async (data: SignInFormData) => {
       // eslint-disable-next-line prefer-template
@@ -130,6 +130,7 @@ const SignIn: React.FC = () => {
             >
               Entrar
             </Button>
+            <Button onPress={LocalNotification}>LocalNotification</Button>
           </Form>
 
           <ForgotPassword

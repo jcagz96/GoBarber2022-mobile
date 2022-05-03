@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Feather';
+import { getUniqueId } from 'react-native-device-info';
+import PushNotification from 'react-native-push-notification';
 import {
   Container,
   Header,
@@ -40,6 +42,31 @@ const Dashboard: React.FC = () => {
       setProviders(response.data);
     });
   }, []);
+
+  useEffect(() => {
+    api.get('/providers').then((response) => {
+      setProviders(response.data);
+    });
+
+    PushNotification.configure({
+      // (optional) Called when Token is generated (iOS and Android)
+      onRegister(token) {
+        console.log('TOKEN:', token);
+        console.log(`device id: ${getUniqueId()}`);
+
+        api
+          .post('/users/registrationToken', {
+            user_id: user.id,
+            device_id: getUniqueId(),
+            registrationToken: token.token,
+            enabled: true,
+          })
+          .then((response) => {
+            console.log(`RegistrationToken registado com sucesso`);
+          });
+      },
+    });
+  }, [user.id]);
 
   const navigateToProfie = useCallback(() => {
     navigation.navigate('Profile');
