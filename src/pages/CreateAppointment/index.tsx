@@ -7,6 +7,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import { Alert, Platform } from 'react-native';
 import { format } from 'date-fns';
+import { io } from 'socket.io-client';
+import { ptBR } from 'date-fns/locale';
 import { useAuth } from '../../hooks/auth';
 import { RootStackParamList } from '../../routes/app.routes';
 import api from '../../services/api';
@@ -134,7 +136,39 @@ const CreateAppointment: React.FC = () => {
         'Ocorreu um erro ao criar agendamento',
       );
     }
-  }, [navigate, selectedDate, selectedHour, selectedProvider]);
+
+    const socket = io(`http://192.168.1.249:3333`, {
+      transports: ['websocket'],
+    });
+    socket.on('connect', () => {
+      console.log('Connected!');
+
+      const dataFormatada = format(
+        selectedDate,
+        "EEEE', dia' dd 'de' MMMM 'de' yyyy 'às' HH:mm'h'",
+        { locale: ptBR },
+      );
+
+      socket.emit('RegisterUserIdAndSocketId_Mobile', {
+        user_id: user.id,
+        username: user.name,
+        plataform: 'mobile',
+        provider_id: selectedProvider,
+        date: dataFormatada,
+      });
+
+      socket.emit('logout', {
+        user_id: user.id,
+      });
+    });
+  }, [
+    navigate,
+    selectedDate,
+    selectedHour,
+    selectedProvider,
+    user.id,
+    user.name,
+  ]);
 
   const morningAvailability = useMemo(
     () =>
