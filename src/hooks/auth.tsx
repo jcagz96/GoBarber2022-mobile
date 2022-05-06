@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../services/api';
+import { UserName } from '../pages/Dashboard/styles';
 
 interface SignInCredentials {
   email: string;
@@ -78,7 +79,6 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   const signOut = useCallback(async () => {
     await AsyncStorage.multiRemove(['@GoBarber:token', '@GoBarber:user']);
-
     setData({} as AuthState);
   }, []);
 

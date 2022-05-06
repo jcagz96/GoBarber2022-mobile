@@ -136,7 +136,7 @@ const SignUp: React.FC = () => {
     [navigation, updateUser],
   );
 
-  const handleUpdateAvatar = useCallback(async () => {
+  const handleUpdateAvatarGallery = useCallback(async () => {
     const imageLibraryResponse = await launchImageLibrary({
       mediaType: 'photo',
       includeBase64: false,
@@ -177,7 +177,7 @@ const SignUp: React.FC = () => {
 
   }, [updateUser]);
 
-  const handleUpdateAvatar2 = useCallback(async () => {
+  const handleUpdateAvatarCamera = useCallback(async () => {
     const imageLibraryResponse = await launchCamera({
       mediaType: 'photo',
       includeBase64: false,
@@ -216,6 +216,15 @@ const SignUp: React.FC = () => {
 
 
   }, [updateUser]);
+
+  const handleLogout = useCallback(async () => {
+    await api.post(`/notification/push-notification/${user.id}/switch`, {
+      enabled: false,
+    });
+
+    signOut();
+
+  }, [signOut, user.id]);
 
   return (
     <KeyboardAvoidingView
@@ -314,7 +323,7 @@ const SignUp: React.FC = () => {
             >
               Confirmar Mudanças
             </Button>
-            <LogoutButton onPress={signOut}>
+            <LogoutButton onPress={handleLogout}>
               <Text>Logout</Text>
             </LogoutButton>
           </Form>
@@ -331,13 +340,13 @@ const SignUp: React.FC = () => {
                 <View style={{ flexDirection: 'row' }}>
                   <Pressable
                     style={[styles.button, styles.buttonClose]}
-                    onPress={handleUpdateAvatar}
+                    onPress={handleUpdateAvatarGallery}
                   >
                     <Text style={styles.textStyle}>Galeria</Text>
                   </Pressable>
                   <Pressable
                     style={[styles.button, styles.buttonClose]}
-                    onPress={handleUpdateAvatar2}
+                    onPress={handleUpdateAvatarCamera}
                   >
                     <Text style={styles.textStyle}>Camera</Text>
                   </Pressable>
@@ -350,7 +359,7 @@ const SignUp: React.FC = () => {
           </Modal>
         </Container>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView >
   );
 };
 
