@@ -118,9 +118,8 @@ const CreateAppointment: React.FC = () => {
   }, []);
 
   const handleCreateAppointment = useCallback(async () => {
+    const date = new Date(selectedDate);
     try {
-      const date = new Date(selectedDate);
-
       date.setHours(selectedHour);
       date.setMinutes(0);
 
@@ -144,7 +143,7 @@ const CreateAppointment: React.FC = () => {
       console.log('Connected!');
 
       const dataFormatada = format(
-        selectedDate,
+        date.getTime(),
         "EEEE', dia' dd 'de' MMMM 'de' yyyy 'às' HH:mm'h'",
         { locale: ptBR },
       );
